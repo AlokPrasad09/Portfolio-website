@@ -1,0 +1,26 @@
+{
+  "sections_order": [
+    { "id": "hero" },
+    { "id": "about" },
+    { "id": "skills" },
+    { "id": "projects" },
+    { "id": "certificates" },
+    { "id": "timeline" },
+    { "id": "github" },
+    { "id": "blog" },
+    { "id": "resume" },
+    { "id": "contact" }
+  ],
+  "sections_enabled": {
+    "hero": true,
+    "about": true,
+    "skills": true,
+    "projects": true,
+    "certificates": true,
+    "timeline": true,
+    "github": true,
+    "blog": true,
+    "resume": true,
+    "contact": true
+  }
+}

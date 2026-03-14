@@ -1,28 +1,76 @@
-# Decap CMS – Portfolio Admin
-# Access at: yourdomain.com/admin
-# For GitHub backend: set repo and use Netlify/Vercel OAuth or GitHub App
+# Decap CMS – Fully Customizable Portfolio
+# Access: yourdomain.com/admin
+# Manage: Hero, Theme, Layout, Projects, Skills, Certificates, Blog
 
 backend:
   name: github
   repo: AlokPrasad09/alok-prasad-portfolio
   branch: main
 
-# For local testing without GitHub (no save):
-# backend:
-#   name: test-backend
-
 publish_mode: simple
-media_folder: "public/uploads"
-public_folder: "/uploads"
+media_folder: "public/images"
+public_folder: "/images"
 locale: "en"
 
 collections:
+  - name: "hero"
+    label: "Hero"
+    file: "public/content/hero.json"
+    format: "json"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Tagline", name: "tagline", widget: "string" }
+      - { label: "Subtitle", name: "subtitle", widget: "text" }
+      - { label: "Profile Image", name: "profile_image", widget: "image", required: false }
+      - { label: "Background Animation", name: "background_animation_type", widget: "select", options: ["particles", "aurora", "gradient_waves", "cyber_grid"], default: "aurora" }
+      - { label: "Enable 3D Animation", name: "enable_3d_animation", widget: "boolean", default: false }
+
+  - name: "theme"
+    label: "Theme"
+    file: "public/content/theme.json"
+    format: "json"
+    fields:
+      - { label: "Preset", name: "preset", widget: "select", options: ["modern_light", "glass", "soft_gradient", "minimal"], default: "modern_light" }
+      - { label: "Primary Color", name: "primary_color", widget: "string", default: "#3B82F6" }
+      - { label: "Secondary Color", name: "secondary_color", widget: "string", default: "#8B5CF6" }
+      - { label: "Background Style", name: "background_style", widget: "select", options: ["solid", "soft_gradient", "grid", "minimal"], default: "soft_gradient" }
+      - { label: "Font Family", name: "font_family", widget: "string", default: "system-ui" }
+      - { label: "Font Scale", name: "font_scale", widget: "select", options: ["0.9", "1", "1.1", "1.2"], default: "1" }
+      - { label: "Button Style", name: "button_style", widget: "select", options: ["rounded", "pill", "sharp"], default: "rounded" }
+      - { label: "Card Style", name: "card_style", widget: "select", options: ["glass", "soft", "bordered", "minimal"], default: "glass" }
+
+  - name: "layout"
+    label: "Layout"
+    file: "public/content/layout.json"
+    format: "json"
+    fields:
+      - name: "sections_order"
+        label: "Section Order (drag to reorder)"
+        widget: "list"
+        max: 10
+        summary: "{{fields.id}}"
+        fields:
+          - { label: "Section ID", name: "id", widget: "string", hint: "hero, about, skills, projects, certificates, timeline, github, blog, resume, contact" }
+      - name: "sections_enabled"
+        label: "Sections Enabled"
+        widget: "object"
+        collapsed: true
+        fields:
+          - { label: "Hero", name: "hero", widget: "boolean", default: true }
+          - { label: "About", name: "about", widget: "boolean", default: true }
+          - { label: "Skills", name: "skills", widget: "boolean", default: true }
+          - { label: "Projects", name: "projects", widget: "boolean", default: true }
+          - { label: "Certificates", name: "certificates", widget: "boolean", default: true }
+          - { label: "Timeline", name: "timeline", widget: "boolean", default: true }
+          - { label: "GitHub", name: "github", widget: "boolean", default: true }
+          - { label: "Blog", name: "blog", widget: "boolean", default: true }
+          - { label: "Resume", name: "resume", widget: "boolean", default: true }
+          - { label: "Contact", name: "contact", widget: "boolean", default: true }
+
   - name: "projects"
     label: "Projects"
     file: "public/content/projects.json"
     format: "json"
-    identifier_field: "title"
-    summary: "{{title}}"
     fields:
       - name: "projects"
         label: "Projects"
@@ -33,31 +81,7 @@ collections:
           - { label: "Tech Stack", name: "tech_stack", widget: "list" }
           - { label: "GitHub Link", name: "github_link", widget: "string", required: false }
           - { label: "Demo Link", name: "demo_link", widget: "string", required: false }
-          - { label: "Image", name: "image", widget: "string", required: false, hint: "URL or path" }
-
-  - name: "blog"
-    label: "Blog"
-    folder: "public/content/blog"
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Date", name: "date", widget: "datetime" }
-      - { label: "Body", name: "body", widget: "markdown" }
-
-  - name: "certificates"
-    label: "Certificates"
-    file: "public/content/certificates.json"
-    format: "json"
-    fields:
-      - name: "certificates"
-        label: "Certificates"
-        widget: "list"
-        fields:
-          - { label: "Title", name: "title", widget: "string" }
-          - { label: "Issuer", name: "issuer", widget: "string" }
-          - { label: "Year", name: "year", widget: "number" }
-          - { label: "Image", name: "image", widget: "string", required: false }
+          - { label: "Image", name: "image", widget: "image", required: false }
 
   - name: "skills"
     label: "Skills"
@@ -71,3 +95,27 @@ collections:
           - { label: "Name", name: "name", widget: "string" }
           - { label: "Category", name: "category", widget: "string" }
           - { label: "Level", name: "level", widget: "string" }
+
+  - name: "certificates"
+    label: "Certificates"
+    file: "public/content/certificates.json"
+    format: "json"
+    fields:
+      - name: "certificates"
+        label: "Certificates"
+        widget: "list"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Issuer", name: "issuer", widget: "string" }
+          - { label: "Year", name: "year", widget: "number" }
+          - { label: "Image", name: "image", widget: "image", required: false }
+
+  - name: "blog"
+    label: "Blog"
+    folder: "public/content/blog"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Content", name: "body", widget: "markdown" }

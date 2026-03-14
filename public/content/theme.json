@@ -1,0 +1,10 @@
+{
+  "preset": "modern_light",
+  "primary_color": "#3B82F6",
+  "secondary_color": "#8B5CF6",
+  "background_style": "soft_gradient",
+  "font_family": "system-ui",
+  "font_scale": "1",
+  "button_style": "rounded",
+  "card_style": "glass"
+}

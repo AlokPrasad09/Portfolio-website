@@ -50,10 +50,10 @@ export function Chatbot() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 z-50 flex h-[380px] w-[340px] flex-col overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-900/95 shadow-2xl shadow-slate-950/50 backdrop-blur-xl"
+            className="fixed bottom-24 right-6 z-50 flex h-[380px] w-[340px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-xl backdrop-blur-xl"
           >
-            <div className="flex items-center justify-between border-b border-slate-700/60 px-4 py-3">
-              <span className="text-sm font-semibold text-slate-100">Portfolio assistant</span>
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+              <span className="text-sm font-semibold text-slate-900">Portfolio assistant</span>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -72,16 +72,17 @@ export function Chatbot() {
                   <div
                     className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
                       msg.role === 'user'
-                        ? 'bg-primary-500/80 text-white'
-                        : 'bg-slate-800/80 text-slate-200'
+                        ? 'text-white'
+                        : 'bg-slate-100 text-slate-800'
                     }`}
+                    style={msg.role === 'user' ? { backgroundColor: 'var(--color-primary)' } : undefined}
                   >
                     {msg.text}
                   </div>
                 </div>
               ))}
             </div>
-            <div className="border-t border-slate-700/60 p-2">
+            <div className="border-t border-slate-200 p-2">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -89,12 +90,13 @@ export function Chatbot() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && send()}
                   placeholder="Ask about projects, skills..."
-                  className="flex-1 rounded-xl border border-slate-600/80 bg-slate-950/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-primary-500/50"
+                  className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-blue-500/50"
                 />
                 <button
                   type="button"
                   onClick={send}
-                  className="rounded-xl bg-primary-500 px-4 py-2 text-sm font-medium text-white hover:bg-primary-600"
+                  className="rounded-xl px-4 py-2 text-sm font-medium text-white"
+                  style={{ backgroundColor: 'var(--color-primary)' }}
                 >
                   Send
                 </button>
@@ -106,7 +108,8 @@ export function Chatbot() {
       <motion.button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg shadow-primary-500/40 hover:shadow-primary-400/50"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-lg"
+        style={{ background: 'var(--color-primary)' }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
         aria-label="Open chatbot"

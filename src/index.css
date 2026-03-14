@@ -1,14 +1,31 @@
 @import "tailwindcss";
 
-/* Base font ~2px larger: 16px → 18px for body, scale headings accordingly */
+/* Modern light theme defaults – overridden by CMS theme.json */
+:root {
+  --color-primary: #3B82F6;
+  --color-secondary: #8B5CF6;
+  --font-family: system-ui, ui-sans-serif, sans-serif;
+  --font-scale: 1;
+  --bg-base: #ffffff;
+  --bg-muted: #f8fafc;
+  --text-primary: #0f172a;
+  --text-muted: #475569;
+  --border-color: #e2e8f0;
+  --shadow-soft: 0 4px 20px rgba(15, 23, 42, 0.06);
+  --shadow-glass: 0 8px 32px rgba(15, 23, 42, 0.08);
+}
+
 html {
   scroll-behavior: smooth;
-  font-size: 18px;
+  font-size: calc(1rem * var(--font-scale, 1));
 }
 
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-family);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
 }
 
 #root {

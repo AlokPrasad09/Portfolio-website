@@ -1,24 +1,27 @@
-import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { FiGithub, FiLinkedin, FiMail } from 'react-icons/fi';
-import { TbDownload, TbMoonStars, TbSunHigh } from 'react-icons/tb';
+import { TbDownload, TbSunHigh } from 'react-icons/tb';
 import { useCmsProjects, useCmsSkills, useCmsCertificates } from './hooks/useCmsContent';
 import { useGitHubRepos } from './hooks/useGitHubRepos';
+import { useHero } from './hooks/useHero';
+import { useTheme } from './hooks/useTheme';
+import { useLayout, type SectionId } from './hooks/useLayout';
 import { Chatbot } from './components/Chatbot';
+import { HeroBackground } from './components/hero/HeroBackground';
 
-type Theme = 'light' | 'dark';
-
-const sections = [
-  { id: 'about', label: 'About' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'certificates', label: 'Certificates' },
-  { id: 'timeline', label: 'Timeline' },
-  { id: 'github', label: 'GitHub' },
-  { id: 'blog', label: 'Blog' },
-  { id: 'resume', label: 'Resume' },
-  { id: 'contact', label: 'Contact' },
-];
+const SECTION_LABELS: Record<SectionId, string> = {
+  hero: 'Hero',
+  about: 'About',
+  skills: 'Skills',
+  projects: 'Projects',
+  certificates: 'Certificates',
+  timeline: 'Timeline',
+  github: 'GitHub',
+  blog: 'Blog',
+  resume: 'Resume',
+  contact: 'Contact',
+};
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -27,7 +30,7 @@ const sectionVariants = {
 };
 
 const glassCard =
-  'backdrop-blur-xl bg-slate-900/40 border border-slate-700/60 shadow-glass rounded-3xl';
+  'backdrop-blur-xl bg-white/80 border border-slate-200/80 rounded-3xl shadow-[0_8px_32px_rgba(15,23,42,0.08)]';
 
 const scrollToSection = (id: string) => {
   const el = document.getElementById(id);
@@ -37,63 +40,27 @@ const scrollToSection = (id: string) => {
 };
 
 function App() {
-  const [theme, setTheme] = useState<Theme>('dark');
-  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [contactStatus, setContactStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const { hero } = useHero();
+  useTheme();
+  const { orderedSections } = useLayout();
   const { projects: cmsProjects } = useCmsProjects();
   const { skills: cmsSkills } = useCmsSkills();
   const { certificates } = useCmsCertificates();
   const { repos: githubRepos, loading: reposLoading } = useGitHubRepos();
 
-  useEffect(() => {
-    const stored = window.localStorage.getItem('theme') as Theme | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const next = stored ?? (prefersDark ? 'dark' : 'light');
-    setTheme(next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
-  }, []);
-
-  const toggleTheme = () => {
-    setTheme((prev) => {
-      const next: Theme = prev === 'dark' ? 'light' : 'dark';
-      document.documentElement.classList.toggle('dark', next === 'dark');
-      window.localStorage.setItem('theme', next);
-      return next;
-    });
-  };
-
-  const handleProfileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setProfileImage(url);
-  };
+  const navSections = orderedSections.filter((id) => id !== 'hero');
 
   return (
-    <div
-      className={`relative min-h-screen overflow-hidden transition-colors duration-300 ${
-        theme === 'dark' ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
-      }`}
-    >
-      {/* Modern background: grid + soft gradient + glowing orbs */}
+    <div className="relative min-h-screen overflow-hidden bg-slate-50 text-slate-900">
+      {/* Light theme: soft gradient background */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900" />
-        <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-80" />
-        <div className="absolute inset-0 bg-radial-glow opacity-60" />
-        <motion.div
-          className="absolute -left-40 top-10 h-[28rem] w-[28rem] rounded-full bg-gradient-hero blur-[100px] opacity-80"
-          animate={{ x: [0, 40, -30, 0], y: [0, -30, 25, 0], rotate: [0, 12, -12, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute -right-32 bottom-20 h-96 w-96 rounded-full bg-gradient-to-tr from-accent-500/30 via-primary-500/20 to-sky-400/30 blur-[100px]"
-          animate={{ x: [0, -50, 30, 0], y: [0, 40, -15, 0], rotate: [0, -15, 15, 0] }}
-          transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(30,41,59,0.4)_1px,transparent_0)] [background-size:32px_32px]"
-          animate={{ backgroundPosition: ['0px 0px', '32px 32px'] }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-slate-50/95 to-slate-100" />
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.06) 0%, transparent 50%)',
+          }}
         />
       </div>
       <Chatbot />
@@ -103,182 +70,155 @@ function App() {
         {/* Navbar */}
         <header className="mb-8 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900/70 text-lg font-semibold text-primary-400 shadow-lg shadow-primary-500/40">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white border border-slate-200 text-lg font-semibold shadow-sm" style={{ color: 'var(--color-primary)' }}>
               AP
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-400">
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                 AI Developer
               </p>
-              <p className="text-sm font-semibold text-slate-100">Alok Prasad</p>
+              <p className="text-sm font-semibold text-slate-900">{hero.name}</p>
             </div>
           </div>
 
-          <nav className="hidden items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-2 text-sm text-slate-300 shadow-lg shadow-slate-900/50 backdrop-blur-xl md:flex">
-            {sections.map((s) => (
+          <nav className="hidden items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-sm text-slate-600 shadow-sm backdrop-blur-xl md:flex">
+            {navSections.map((id) => (
               <button
-                key={s.id}
-                onClick={() => scrollToSection(s.id)}
-                className="rounded-full px-3 py-1.5 transition-colors hover:bg-slate-800/70 hover:text-slate-50"
+                key={id}
+                onClick={() => scrollToSection(id)}
+                className="rounded-full px-3 py-1.5 transition-colors hover:bg-slate-100 hover:text-slate-900"
               >
-                {s.label}
+                {SECTION_LABELS[id]}
               </button>
             ))}
             <a
               href="/admin"
               target="_blank"
               rel="noreferrer"
-              className="rounded-full px-3 py-1.5 text-slate-500 transition hover:bg-slate-800/70 hover:text-slate-300"
+              className="rounded-full px-3 py-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
             >
               Admin
             </a>
           </nav>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-700/60 bg-slate-900/60 text-slate-200 shadow-lg shadow-slate-900/60 backdrop-blur-xl transition hover:border-primary-500/80 hover:text-primary-300"
-              aria-label="Toggle theme"
-            >
-              <AnimatePresence initial={false} mode="wait">
-                {theme === 'dark' ? (
-                  <motion.span
-                    key="moon"
-                    initial={{ opacity: 0, y: 6, rotate: -10 }}
-                    animate={{ opacity: 1, y: 0, rotate: 0 }}
-                    exit={{ opacity: 0, y: -6, rotate: 10 }}
-                    transition={{ duration: 0.18 }}
-                  >
-                    <TbSunHigh className="h-5 w-5" />
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="sun"
-                    initial={{ opacity: 0, y: 6, rotate: 10 }}
-                    animate={{ opacity: 1, y: 0, rotate: 0 }}
-                    exit={{ opacity: 0, y: -6, rotate: -10 }}
-                    transition={{ duration: 0.18 }}
-                  >
-                    <TbMoonStars className="h-5 w-5" />
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </button>
-          </div>
+          <a
+            href="/admin"
+            target="_blank"
+            rel="noreferrer"
+            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white/80 text-slate-600 shadow-sm backdrop-blur-xl transition hover:border-slate-300 hover:text-slate-900"
+            aria-label="Admin"
+          >
+            <TbSunHigh className="h-5 w-5" />
+          </a>
         </header>
 
         {/* Hero + Sidebar */}
         <main className="grid flex-1 grid-cols-1 gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-start">
-          {/* Hero */}
-          <section
-            id="hero"
-            className={`${glassCard} relative overflow-hidden px-6 py-8 sm:px-10 sm:py-10`}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
-              className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center"
+          {orderedSections.includes('hero') && (
+            <section
+              id="hero"
+              className={`${glassCard} relative overflow-hidden px-6 py-8 sm:px-10 sm:py-10`}
             >
-              <div className="flex-1 space-y-5">
-                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.25em] text-emerald-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  Available for AI projects
-                </div>
-                <div>
-                  <h1 className="text-balance text-4xl font-semibold tracking-tight text-slate-50 sm:text-5xl lg:text-6xl">
-                    Building AI tools and
-                    <span className="bg-gradient-to-r from-primary-400 via-sky-300 to-accent-400 bg-clip-text text-transparent">
-                      {' '}
-                      intelligent applications
-                    </span>
-                  </h1>
-                  <p className="mt-4 max-w-xl text-base text-slate-300 sm:text-lg">
-                    I&apos;m Alok, an AI developer focused on turning ideas into intelligent
-                    products—from chatbots and document AI to full-stack AI applications.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <button
-                    onClick={() => scrollToSection('projects')}
-                    className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-500 via-indigo-500 to-accent-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/40 transition hover:shadow-primary-400/50"
-                  >
-                    <span>View Projects</span>
-                  </button>
-                  <a
-                    href="/Alok_Prasad_Resume.pdf"
-                    className="inline-flex items-center gap-2 rounded-full border border-slate-600/80 bg-slate-900/60 px-4 py-2.5 text-sm font-semibold text-slate-100 shadow-md shadow-slate-900/60 transition hover:border-primary-400/80 hover:text-primary-200"
-                  >
-                    <TbDownload className="h-4 w-4" />
-                    <span>Download Resume</span>
-                  </a>
-                  <button
-                    onClick={() => scrollToSection('contact')}
-                    className="inline-flex items-center gap-2 text-sm font-medium text-slate-300 underline-offset-4 hover:text-primary-200 hover:underline"
-                  >
-                    Contact Me
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
-                  <div className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
-                    <span>AI / ML</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-                    <span>LLMs & Prompt Engineering</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    <span>Full-stack with React</span>
-                  </div>
-                </div>
-
-                <div className="mt-2">
-                  <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-slate-400 hover:text-slate-200">
-                    <span className="rounded-full border border-slate-600/70 bg-slate-900/60 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.22em]">
-                      Upload profile photo
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfileUpload}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              </div>
-
+              <HeroBackground hero={hero} />
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, rotateX: 15 }}
-                animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
-                className="relative mt-4 flex w-full justify-center md:mt-0 md:w-[230px]"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: 'easeOut' }}
+                className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center"
               >
-                <div className="relative h-52 w-52 overflow-hidden rounded-[32px] border border-slate-600/70 bg-slate-900/70 shadow-2xl shadow-slate-900/70">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0,rgba(94,234,212,0.3),transparent_55%),radial-gradient(circle_at_80%_0,rgba(129,140,248,0.5),transparent_55%)]" />
-                  <div className="relative flex h-full flex-col items-center justify-center gap-2">
-                    {profileImage && (
-                      <img
-                        src={profileImage}
-                        alt="Profile"
-                        className="h-24 w-24 rounded-3xl object-cover border border-slate-700 shadow-lg"
-                      />
-                    )}
-                    <span className="rounded-full bg-slate-900/80 px-3 py-0.5 text-[10px] font-medium uppercase tracking-[0.3em] text-slate-300/90">
-                      AI Developer
-                    </span>
-                    <p className="mt-1 text-lg font-semibold text-slate-50">Alok Prasad</p>
-                    <p className="text-xs text-slate-300/80">
-                      Crafting intelligent experiences with code.
+                <div className="flex-1 space-y-5">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-blue-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                    Available for AI projects
+                  </div>
+                  <div>
+                    <h1 className="text-balance text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+                      {hero.tagline?.includes(' and ')
+                        ? (
+                            <>
+                              {hero.tagline.split(' and ')[0]}
+                              <span className="bg-gradient-to-r from-blue-600 to-violet-500 bg-clip-text text-transparent">
+                                {' and '}
+                                {hero.tagline.split(' and ')[1]}
+                              </span>
+                            </>
+                          )
+                        : hero.tagline}
+                    </h1>
+                    <p className="mt-4 max-w-xl text-base text-slate-600 sm:text-lg">
+                      {hero.subtitle}
                     </p>
                   </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      onClick={() => scrollToSection('projects')}
+                      className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:shadow-lg"
+                      style={{ background: 'var(--color-primary)' }}
+                    >
+                      View Projects
+                    </button>
+                    <a
+                      href="/Alok_Prasad_Resume.pdf"
+                      className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                    >
+                      <TbDownload className="h-4 w-4" />
+                      Download Resume
+                    </a>
+                    <button
+                      onClick={() => scrollToSection('contact')}
+                      className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
+                    >
+                      Contact Me
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
+                      <span>AI / ML</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
+                      <span>LLMs & Prompt Engineering</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      <span>Full-stack with React</span>
+                    </div>
+                  </div>
                 </div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
+                  className="relative mt-4 flex w-full justify-center md:mt-0 md:w-[230px]"
+                >
+                  <div className="relative h-52 w-52 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+                    {hero.profile_image ? (
+                      <img
+                        src={hero.profile_image}
+                        alt={hero.name}
+                        className="h-full w-full object-cover"
+                        loading="eager"
+                      />
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center gap-2 bg-slate-100 p-4">
+                        <span className="rounded-full bg-white px-3 py-1 text-xs font-medium uppercase tracking-wider text-slate-500 shadow-sm">
+                          AI Developer
+                        </span>
+                        <p className="text-lg font-semibold text-slate-800">{hero.name}</p>
+                        <p className="text-center text-xs text-slate-600">
+                          Crafting intelligent experiences with code.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
               </motion.div>
-            </motion.div>
-          </section>
+            </section>
+          )}
 
           {/* Quick links / Social / GitHub stats preview */}
           <aside className="flex flex-col gap-4">
@@ -289,7 +229,7 @@ function App() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className={`${glassCard} px-5 py-4`}
             >
-              <p className="mb-3 text-xs font-medium uppercase tracking-[0.25em] text-slate-400">
+              <p className="mb-3 text-xs font-medium uppercase tracking-wider text-slate-500">
                 Quick navigation
               </p>
               <div className="flex flex-wrap gap-2">
@@ -299,7 +239,7 @@ function App() {
                     <button
                       key={label}
                       onClick={() => scrollToSection(id)}
-                      className="rounded-full bg-slate-800/70 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-primary-600/70 hover:text-slate-50"
+                      className="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-200 hover:text-slate-900"
                     >
                       {label}
                     </button>
@@ -316,10 +256,10 @@ function App() {
               className={`${glassCard} flex items-center justify-between px-5 py-4`}
             >
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.25em] text-slate-400">
+                <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                   Connect
                 </p>
-                <p className="mt-1 text-sm text-slate-200">
+                <p className="mt-1 text-sm text-slate-700">
                   Let&apos;s collaborate on AI products.
                 </p>
               </div>
@@ -328,7 +268,7 @@ function App() {
                   href="https://github.com/AlokPrasad09"
                   target="_blank"
                   rel="noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900/70 text-slate-300 shadow-lg shadow-slate-900/70 transition hover:bg-slate-100 hover:text-slate-950"
+                  className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm transition hover:bg-slate-200 hover:text-slate-900"
                   aria-label="GitHub"
                 >
                   <FiGithub className="h-4 w-4" />
@@ -337,7 +277,7 @@ function App() {
                   href="https://www.linkedin.com/in/alokprasad92"
                   target="_blank"
                   rel="noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900/70 text-slate-300 shadow-lg shadow-slate-900/70 transition hover:bg-sky-500 hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm transition hover:bg-sky-500 hover:text-white"
                   aria-label="LinkedIn"
                 >
                   <FiLinkedin className="h-4 w-4" />
@@ -346,14 +286,14 @@ function App() {
                   href="https://www.salesforce.com/trailblazer/alokprasad"
                   target="_blank"
                   rel="noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900/70 text-slate-300 shadow-lg shadow-slate-900/70 transition hover:bg-amber-400 hover:text-slate-900"
+                  className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm transition hover:bg-amber-400 hover:text-slate-900"
                   aria-label="Salesforce Trailblazer"
                 >
                   <span className="text-[10px] font-semibold">Sf</span>
                 </a>
                 <a
                   href="mailto:youremail@example.com"
-                  className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900/70 text-slate-300 shadow-lg shadow-slate-900/70 transition hover:bg-emerald-500 hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-sm transition hover:bg-emerald-500 hover:text-white"
                   aria-label="Email"
                 >
                   <FiMail className="h-4 w-4" />
@@ -363,9 +303,9 @@ function App() {
           </aside>
         </main>
 
-        {/* Content sections */}
+        {/* Content sections – order and visibility from CMS layout */}
         <div className="mt-10 space-y-10">
-          {/* About */}
+          {orderedSections.includes('about') && (
           <motion.section
             id="about"
             variants={sectionVariants}
@@ -377,15 +317,15 @@ function App() {
           >
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-slate-50 sm:text-xl">
+                <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
                   About Me
                 </h2>
-                <p className="mt-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-400">
+                <p className="mt-1 text-xs font-medium uppercase tracking-wider text-slate-500">
                   The journey into AI
                 </p>
               </div>
             </div>
-            <div className="mt-5 space-y-4 text-sm text-slate-200 sm:text-[0.95rem]">
+            <div className="mt-5 space-y-4 text-sm text-slate-600 sm:text-[0.95rem]">
               <p>
                 My curiosity for technology naturally drew me toward artificial intelligence—
                 the intersection where code starts to feel intelligent. What began as
@@ -406,8 +346,9 @@ function App() {
               </p>
             </div>
           </motion.section>
+          )}
 
-          {/* Skills */}
+          {orderedSections.includes('skills') && (
           <motion.section
             id="skills"
             variants={sectionVariants}
@@ -489,8 +430,9 @@ function App() {
               </div>
             </div>
           </motion.section>
+          )}
 
-          {/* Projects */}
+          {orderedSections.includes('projects') && (
           <motion.section
             id="projects"
             variants={sectionVariants}
@@ -580,8 +522,9 @@ function App() {
               })}
             </div>
           </motion.section>
+          )}
 
-          {/* Career timeline */}
+          {orderedSections.includes('timeline') && (
           <motion.section
             id="timeline"
             variants={sectionVariants}
@@ -633,9 +576,10 @@ function App() {
               ))}
             </ol>
           </motion.section>
+          )}
 
           {/* Certificates */}
-          {certificates.length > 0 && (
+          {orderedSections.includes('certificates') && certificates.length > 0 && (
             <motion.section
               id="certificates"
               variants={sectionVariants}
@@ -670,7 +614,7 @@ function App() {
             </motion.section>
           )}
 
-          {/* GitHub stats + Repos + Tech stack */}
+          {orderedSections.includes('github') && (
           <motion.section
             id="github"
             variants={sectionVariants}
@@ -681,7 +625,7 @@ function App() {
             className="grid gap-6 md:grid-cols-[1.1fr_1fr]"
           >
             <div className={`${glassCard} px-6 py-6 sm:px-8 sm:py-8`}>
-              <h2 className="text-lg font-semibold text-slate-50 sm:text-xl">
+              <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
                 GitHub Activity
               </h2>
               <p className="mt-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-400">
@@ -774,8 +718,9 @@ function App() {
               </div>
             </div>
           </motion.section>
+          )}
 
-          {/* Blog */}
+          {orderedSections.includes('blog') && (
           <motion.section
             id="blog"
             variants={sectionVariants}
@@ -835,8 +780,9 @@ function App() {
               ))}
             </div>
           </motion.section>
+          )}
 
-          {/* Resume + Contact */}
+          {(orderedSections.includes('resume') || orderedSections.includes('contact')) && (
           <motion.section
             id="resume"
             variants={sectionVariants}
@@ -961,6 +907,7 @@ function App() {
               </p>
             </div>
           </motion.section>
+          )}
         </div>
 
         {/* Footer */}
