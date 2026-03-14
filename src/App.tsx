@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FiGithub, FiLinkedin, FiMail } from 'react-icons/fi';
 import { TbDownload, TbMoonStars, TbSunHigh } from 'react-icons/tb';
+import { useCmsProjects, useCmsSkills, useCmsCertificates } from './hooks/useCmsContent';
+import { useGitHubRepos } from './hooks/useGitHubRepos';
+import { Chatbot } from './components/Chatbot';
 
 type Theme = 'light' | 'dark';
 
@@ -9,9 +12,9 @@ const sections = [
   { id: 'about', label: 'About' },
   { id: 'skills', label: 'Skills' },
   { id: 'projects', label: 'Projects' },
+  { id: 'certificates', label: 'Certificates' },
   { id: 'timeline', label: 'Timeline' },
   { id: 'github', label: 'GitHub' },
-  { id: 'techstack', label: 'Tech Stack' },
   { id: 'blog', label: 'Blog' },
   { id: 'resume', label: 'Resume' },
   { id: 'contact', label: 'Contact' },
@@ -20,6 +23,7 @@ const sections = [
 const sectionVariants = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: 'easeOut' },
 };
 
 const glassCard =
@@ -35,6 +39,11 @@ const scrollToSection = (id: string) => {
 function App() {
   const [theme, setTheme] = useState<Theme>('dark');
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [contactStatus, setContactStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const { projects: cmsProjects } = useCmsProjects();
+  const { skills: cmsSkills } = useCmsSkills();
+  const { certificates } = useCmsCertificates();
+  const { repos: githubRepos, loading: reposLoading } = useGitHubRepos();
 
   useEffect(() => {
     const stored = window.localStorage.getItem('theme') as Theme | null;
@@ -66,25 +75,28 @@ function App() {
         theme === 'dark' ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
       }`}
     >
-      {/* 3D-style animated background */}
+      {/* Modern background: grid + soft gradient + glowing orbs */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-radial-glow opacity-70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900" />
+        <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-80" />
+        <div className="absolute inset-0 bg-radial-glow opacity-60" />
         <motion.div
-          className="absolute -left-32 top-20 h-80 w-80 rounded-full bg-gradient-hero blur-3xl"
-          animate={{ x: [0, 30, -20, 0], y: [0, -20, 20, 0], rotate: [0, 10, -10, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute -left-40 top-10 h-[28rem] w-[28rem] rounded-full bg-gradient-hero blur-[100px] opacity-80"
+          animate={{ x: [0, 40, -30, 0], y: [0, -30, 25, 0], rotate: [0, 12, -12, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute -right-24 bottom-10 h-96 w-96 rounded-full bg-gradient-to-tr from-accent-500/40 via-primary-500/20 to-sky-400/40 blur-3xl"
-          animate={{ x: [0, -40, 20, 0], y: [0, 30, -10, 0], rotate: [0, -12, 12, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute -right-32 bottom-20 h-96 w-96 rounded-full bg-gradient-to-tr from-accent-500/30 via-primary-500/20 to-sky-400/30 blur-[100px]"
+          animate={{ x: [0, -50, 30, 0], y: [0, 40, -15, 0], rotate: [0, -15, 15, 0] }}
+          transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,#1e293b_1px,transparent_0)] opacity-40 [background-size:24px_24px]"
-          animate={{ backgroundPosition: ['0px 0px', '24px 24px'] }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+          className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(30,41,59,0.4)_1px,transparent_0)] [background-size:32px_32px]"
+          animate={{ backgroundPosition: ['0px 0px', '32px 32px'] }}
+          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
         />
       </div>
+      <Chatbot />
 
       {/* Page layout */}
       <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 pb-10 pt-6 sm:px-6 lg:px-10">
@@ -102,16 +114,24 @@ function App() {
             </div>
           </div>
 
-          <nav className="hidden items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-300 shadow-lg shadow-slate-900/50 backdrop-blur-xl md:flex">
+          <nav className="hidden items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-2 text-sm text-slate-300 shadow-lg shadow-slate-900/50 backdrop-blur-xl md:flex">
             {sections.map((s) => (
               <button
                 key={s.id}
                 onClick={() => scrollToSection(s.id)}
-                className="rounded-full px-3 py-1 transition-colors hover:bg-slate-800/70 hover:text-slate-50"
+                className="rounded-full px-3 py-1.5 transition-colors hover:bg-slate-800/70 hover:text-slate-50"
               >
                 {s.label}
               </button>
             ))}
+            <a
+              href="/admin"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full px-3 py-1.5 text-slate-500 transition hover:bg-slate-800/70 hover:text-slate-300"
+            >
+              Admin
+            </a>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -166,14 +186,14 @@ function App() {
                   Available for AI projects
                 </div>
                 <div>
-                  <h1 className="text-balance text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl lg:text-5xl">
+                  <h1 className="text-balance text-4xl font-semibold tracking-tight text-slate-50 sm:text-5xl lg:text-6xl">
                     Building AI tools and
                     <span className="bg-gradient-to-r from-primary-400 via-sky-300 to-accent-400 bg-clip-text text-transparent">
                       {' '}
                       intelligent applications
                     </span>
                   </h1>
-                  <p className="mt-3 max-w-xl text-sm text-slate-300 sm:text-base">
+                  <p className="mt-4 max-w-xl text-base text-slate-300 sm:text-lg">
                     I&apos;m Alok, an AI developer focused on turning ideas into intelligent
                     products—from chatbots and document AI to full-stack AI applications.
                   </p>
@@ -409,36 +429,39 @@ function App() {
                 </div>
               </div>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {['Python', 'Machine Learning', 'LLMs', 'Prompt Engineering'].map(
-                  (skill) => (
-                    <motion.div
-                      key={skill}
-                      whileHover={{ y: -4, scale: 1.02 }}
-                      className="group flex items-center justify-between rounded-2xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-100"
-                    >
-                      <span>{skill}</span>
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400">
-                        AI / ML
-                      </span>
-                    </motion.div>
-                  ),
-                )}
+                {(cmsSkills.length ? cmsSkills : [
+                  { name: 'Python', category: 'AI / ML', level: 'Advanced' },
+                  { name: 'Machine Learning', category: 'AI / ML', level: 'Advanced' },
+                  { name: 'LLMs', category: 'AI / ML', level: 'Intermediate' },
+                  { name: 'React', category: 'Development', level: 'Advanced' },
+                ]).map((skill) => (
+                  <motion.div
+                    key={skill.name}
+                    whileHover={{ y: -4, scale: 1.02 }}
+                    className="group flex items-center justify-between rounded-2xl border border-slate-700/70 bg-slate-900/60 px-4 py-3 text-sm text-slate-100"
+                  >
+                    <span>{skill.name}</span>
+                    <span className="text-xs uppercase tracking-wide text-slate-400">
+                      {skill.category} · {skill.level}
+                    </span>
+                  </motion.div>
+                ))}
               </div>
             </div>
 
             <div className="space-y-4">
               <div className={`${glassCard} px-5 py-5`}>
-                <h3 className="text-sm font-semibold text-slate-50">
+                <h3 className="text-base font-semibold text-slate-50">
                   Development & Product
                 </h3>
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-sm text-slate-400">
                   From idea to deployed, production-ready interfaces.
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-100">
+                <div className="mt-4 flex flex-wrap gap-2 text-sm text-slate-100">
                   {['Web Development', 'React', 'TypeScript', 'APIs'].map((item) => (
                     <span
                       key={item}
-                      className="rounded-full bg-slate-900/70 px-3 py-1 text-xs text-slate-200"
+                      className="rounded-full bg-slate-900/70 px-3 py-1.5 text-sm text-slate-200"
                     >
                       {item}
                     </span>
@@ -447,16 +470,16 @@ function App() {
               </div>
 
               <div className={`${glassCard} px-5 py-5`}>
-                <h3 className="text-sm font-semibold text-slate-50">AI Tools</h3>
-                <p className="mt-1 text-xs text-slate-400">
+                <h3 className="text-base font-semibold text-slate-50">AI Tools</h3>
+                <p className="mt-1 text-sm text-slate-400">
                   Infrastructure for intelligent applications.
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-100">
+                <div className="mt-3 flex flex-wrap gap-2 text-sm text-slate-100">
                   {['Vector Databases', 'AI Chatbots', 'Document AI', 'RAG Systems'].map(
                     (item) => (
                       <span
                         key={item}
-                        className="rounded-full bg-slate-900/70 px-3 py-1 text-xs text-slate-200"
+                        className="rounded-full bg-slate-900/70 px-3 py-1.5 text-sm text-slate-200"
                       >
                         {item}
                       </span>
@@ -489,88 +512,72 @@ function App() {
             </div>
 
             <div className="grid gap-5 md:grid-cols-3">
-              {[
-                {
-                  title: 'NCERT AI Assistant',
-                  description:
-                    'An AI-powered assistant that understands NCERT PDFs and helps students learn faster with instant explanations, summaries, and Q&A.',
-                  tech: ['Python', 'LLMs', 'Vector DB', 'React'],
-                  image:
-                    'linear-gradient(135deg, rgba(56,189,248,0.35), rgba(129,140,248,0.3))',
-                },
-                {
-                  title: 'PDF AI Tool',
-                  description:
-                    'A document AI system that ingests PDFs, builds semantic understanding, and answers complex questions grounded in the content.',
-                  tech: ['Document AI', 'RAG', 'Node.js', 'TypeScript'],
-                  image:
-                    'linear-gradient(135deg, rgba(236,72,153,0.42), rgba(248,113,113,0.35))',
-                },
-                {
-                  title: 'AI Chatbot',
-                  description:
-                    'A mini ChatGPT-style chatbot experience with conversational memory and custom system behavior tailored to specific use-cases.',
-                  tech: ['Chat UI', 'LLM', 'React', 'Framer Motion'],
-                  image:
-                    'linear-gradient(135deg, rgba(129,140,248,0.4), rgba(45,212,191,0.35))',
-                },
-              ].map((project) => (
-                <motion.article
-                  key={project.title}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-                  className={`${glassCard} flex flex-col overflow-hidden`}
-                >
-                  <div
-                    className="relative h-32 w-full overflow-hidden"
-                    style={{
-                      backgroundImage: project.image,
-                    }}
+              {cmsProjects.map((project, i) => {
+                const gradient =
+                  i % 3 === 0
+                    ? 'linear-gradient(135deg, rgba(56,189,248,0.35), rgba(129,140,248,0.3))'
+                    : i % 3 === 1
+                      ? 'linear-gradient(135deg, rgba(236,72,153,0.42), rgba(248,113,113,0.35))'
+                      : 'linear-gradient(135deg, rgba(129,140,248,0.4), rgba(45,212,191,0.35))';
+                return (
+                  <motion.article
+                    key={project.title}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                    className={`${glassCard} flex flex-col overflow-hidden`}
                   >
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0,rgba(15,23,42,0.2),transparent_55%),radial-gradient(circle_at_80%_100%,rgba(15,23,42,0.35),transparent_55%)]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.3)_1px,transparent_0)] opacity-50 [background-size:18px_18px]" />
-                  </div>
-                  <div className="flex flex-1 flex-col px-4 pb-4 pt-3">
-                    <h3 className="text-sm font-semibold text-slate-50">
-                      {project.title}
-                    </h3>
-                    <p className="mt-2 flex-1 text-xs text-slate-300">
-                      {project.description}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {project.tech.map((t) => (
-                        <span
-                          key={t}
-                          className="rounded-full bg-slate-900/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-slate-300"
+                    <div
+                      className="relative h-36 w-full overflow-hidden"
+                      style={{ backgroundImage: project.image ? `url(${project.image})` : gradient, backgroundSize: 'cover' }}
+                    >
+                      {!project.image && (
+                        <>
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0,rgba(15,23,42,0.2),transparent_55%),radial-gradient(circle_at_80%_100%,rgba(15,23,42,0.35),transparent_55%)]" />
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.3)_1px,transparent_0)] opacity-50 [background-size:18px_18px]" />
+                        </>
+                      )}
+                    </div>
+                    <div className="flex flex-1 flex-col px-4 pb-4 pt-3">
+                      <h3 className="text-base font-semibold text-slate-50">
+                        {project.title}
+                      </h3>
+                      <p className="mt-2 flex-1 text-sm text-slate-300">
+                        {project.description}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {(project.tech_stack || []).map((t) => (
+                          <span
+                            key={t}
+                            className="rounded-full bg-slate-900/70 px-2.5 py-1 text-xs font-medium uppercase tracking-wide text-slate-300"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="mt-4 flex gap-2 text-sm">
+                        <a
+                          href={project.github_link || 'https://github.com/AlokPrasad09'}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-600/80 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-slate-300 hover:text-slate-50"
                         >
-                          {t}
-                        </span>
-                      ))}
+                          <FiGithub className="h-4 w-4" />
+                          GitHub
+                        </a>
+                        <a
+                          href={project.demo_link || '#'}
+                          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 px-3 py-2 text-xs font-semibold text-white shadow-md shadow-primary-500/40 transition hover:shadow-primary-400/60"
+                        >
+                          Live demo
+                        </a>
+                      </div>
                     </div>
-                    <div className="mt-4 flex gap-2 text-xs">
-                      <a
-                        href={
-                          project.title === 'NCERT AI Assistant'
-                            ? 'https://github.com/AlokPrasad09/ncert_ai_tutor'
-                            : 'https://github.com/AlokPrasad09'
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-600/80 bg-slate-950/60 px-3 py-1.5 text-[11px] font-semibold text-slate-200 transition hover:border-slate-300 hover:text-slate-50"
-                      >
-                        <FiGithub className="h-3.5 w-3.5" />
-                        GitHub
-                      </a>
-                      <a
-                        href="#"
-                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 px-3 py-1.5 text-[11px] font-semibold text-white shadow-md shadow-primary-500/40 transition hover:shadow-primary-400/60"
-                      >
-                        Live demo
-                      </a>
-                    </div>
-                  </div>
-                </motion.article>
-              ))}
+                  </motion.article>
+                );
+              })}
             </div>
           </motion.section>
 
@@ -627,7 +634,43 @@ function App() {
             </ol>
           </motion.section>
 
-          {/* GitHub stats + Tech stack */}
+          {/* Certificates */}
+          {certificates.length > 0 && (
+            <motion.section
+              id="certificates"
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.6 }}
+              className={`${glassCard} px-6 py-6 sm:px-8 sm:py-8`}
+            >
+              <h2 className="text-xl font-semibold text-slate-50 sm:text-2xl">
+                Certificates
+              </h2>
+              <p className="mt-1 text-sm font-medium uppercase tracking-wider text-slate-400">
+                Credentials & learning
+              </p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {certificates.map((cert) => (
+                  <motion.div
+                    key={cert.title}
+                    whileHover={{ y: -4 }}
+                    className="rounded-2xl border border-slate-700/70 bg-slate-900/60 p-4"
+                  >
+                    {cert.image && (
+                      <img src={cert.image} alt="" className="mb-3 h-20 w-full rounded-lg object-contain bg-slate-800/50" />
+                    )}
+                    <div className="text-base font-semibold text-slate-50">{cert.title}</div>
+                    <div className="text-sm text-slate-400">{cert.issuer}</div>
+                    <div className="text-xs text-slate-500">{cert.year}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {/* GitHub stats + Repos + Tech stack */}
           <motion.section
             id="github"
             variants={sectionVariants}
@@ -644,11 +687,33 @@ function App() {
               <p className="mt-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-400">
                 Live stats & contributions
               </p>
-              <p className="mt-3 text-xs text-slate-300">
-                These stats are powered by GitHub APIs and updated automatically. Replace the
-                username to point to your actual profile.
+              <p className="mt-3 text-sm text-slate-300">
+                Live stats and repositories from GitHub.
               </p>
-              <div className="mt-4 space-y-4 text-xs">
+              {!reposLoading && githubRepos.length > 0 && (
+                <div className="mt-4 space-y-3">
+                  <p className="text-sm font-medium text-slate-400">Repositories</p>
+                  {githubRepos.slice(0, 5).map((repo) => (
+                    <a
+                      key={repo.name}
+                      href={repo.html_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block rounded-xl border border-slate-700/70 bg-slate-900/70 px-4 py-3 text-sm transition hover:border-primary-500/50"
+                    >
+                      <div className="font-semibold text-slate-100">{repo.name}</div>
+                      {repo.description && (
+                        <div className="mt-1 text-xs text-slate-400 line-clamp-2">{repo.description}</div>
+                      )}
+                      <div className="mt-2 flex gap-3 text-xs text-slate-500">
+                        <span>★ {repo.stargazers_count}</span>
+                        {repo.language && <span>{repo.language}</span>}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              )}
+              <div className="mt-4 space-y-4 text-sm">
                 <div className="overflow-hidden rounded-2xl border border-slate-700/70 bg-slate-900/70">
                   <img
                     src="https://github-readme-stats.vercel.app/api?username=AlokPrasad09&show_icons=true&theme=tokyonight&hide_border=true"
@@ -822,47 +887,77 @@ function App() {
               <p className="mt-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-400">
                 Let&apos;s work together
               </p>
-              <form className="mt-4 space-y-3 text-xs">
+              <form
+                className="mt-4 space-y-3 text-sm"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const form = e.currentTarget;
+                  const name = (form.querySelector('[name="name"]') as HTMLInputElement)?.value;
+                  const email = (form.querySelector('[name="email"]') as HTMLInputElement)?.value;
+                  const message = (form.querySelector('[name="message"]') as HTMLTextAreaElement)?.value;
+                  if (!name || !email || !message) return;
+                  setContactStatus('sending');
+                  try {
+                    const res = await fetch('/api/contact', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ name, email, message }),
+                    });
+                    if (res.ok) {
+                      setContactStatus('sent');
+                      form.reset();
+                    } else setContactStatus('error');
+                  } catch {
+                    setContactStatus('error');
+                  }
+                }}
+              >
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium uppercase tracking-[0.2em] text-slate-400">
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-slate-400">
                     Name
                   </label>
                   <input
+                    name="name"
                     type="text"
                     placeholder="Your name"
-                    className="w-full rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 outline-none ring-primary-500/40 placeholder:text-slate-500 focus:ring-2"
+                    required
+                    className="w-full rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-2.5 text-sm text-slate-100 outline-none ring-primary-500/40 placeholder:text-slate-500 focus:ring-2"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium uppercase tracking-[0.2em] text-slate-400">
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-slate-400">
                     Email
                   </label>
                   <input
+                    name="email"
                     type="email"
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 outline-none ring-primary-500/40 placeholder:text-slate-500 focus:ring-2"
+                    required
+                    className="w-full rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-2.5 text-sm text-slate-100 outline-none ring-primary-500/40 placeholder:text-slate-500 focus:ring-2"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium uppercase tracking-[0.2em] text-slate-400">
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-slate-400">
                     Message
                   </label>
                   <textarea
+                    name="message"
                     rows={4}
                     placeholder="Tell me a bit about your project or idea."
-                    className="w-full resize-none rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-2 text-xs text-slate-100 outline-none ring-primary-500/40 placeholder:text-slate-500 focus:ring-2"
+                    required
+                    className="w-full resize-none rounded-xl border border-slate-700/70 bg-slate-950/60 px-3 py-2.5 text-sm text-slate-100 outline-none ring-primary-500/40 placeholder:text-slate-500 focus:ring-2"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 via-indigo-500 to-accent-500 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-primary-500/40 transition hover:shadow-primary-400/60"
+                  disabled={contactStatus === 'sending'}
+                  className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 via-indigo-500 to-accent-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/40 transition hover:shadow-primary-400/60 disabled:opacity-70"
                 >
-                  Send Message
+                  {contactStatus === 'sending' ? 'Sending…' : contactStatus === 'sent' ? 'Sent!' : contactStatus === 'error' ? 'Try again' : 'Send Message'}
                 </button>
               </form>
-              <p className="mt-3 text-[11px] text-slate-500">
-                This form is currently UI-only. Hook it up to your preferred email or form
-                backend service.
+              <p className="mt-3 text-xs text-slate-500">
+                Submissions are sent to the serverless API. Add Resend or SendGrid in <code className="rounded bg-slate-800 px-1">api/contact.ts</code> to receive emails.
               </p>
             </div>
           </motion.section>

@@ -1,0 +1,28 @@
+{
+  "projects": [
+    {
+      "title": "NCERT AI Assistant",
+      "description": "An AI-powered assistant that understands NCERT PDFs and helps students learn faster with instant explanations, summaries, and Q&A.",
+      "tech_stack": ["Python", "LLMs", "Vector DB", "React"],
+      "github_link": "https://github.com/AlokPrasad09/ncert_ai_tutor",
+      "demo_link": "",
+      "image": ""
+    },
+    {
+      "title": "PDF AI Tool",
+      "description": "A document AI system that ingests PDFs, builds semantic understanding, and answers complex questions grounded in the content.",
+      "tech_stack": ["Document AI", "RAG", "Node.js", "TypeScript"],
+      "github_link": "https://github.com/AlokPrasad09",
+      "demo_link": "",
+      "image": ""
+    },
+    {
+      "title": "AI Chatbot",
+      "description": "A mini ChatGPT-style chatbot experience with conversational memory and custom system behavior tailored to specific use-cases.",
+      "tech_stack": ["Chat UI", "LLM", "React", "Framer Motion"],
+      "github_link": "https://github.com/AlokPrasad09",
+      "demo_link": "",
+      "image": ""
+    }
+  ]
+}

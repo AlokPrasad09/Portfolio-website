@@ -1,0 +1,11 @@
+{
+  "skills": [
+    { "name": "Python", "category": "AI / ML", "level": "Advanced" },
+    { "name": "Machine Learning", "category": "AI / ML", "level": "Advanced" },
+    { "name": "LLMs", "category": "AI / ML", "level": "Intermediate" },
+    { "name": "Prompt Engineering", "category": "AI / ML", "level": "Intermediate" },
+    { "name": "React", "category": "Development", "level": "Advanced" },
+    { "name": "TypeScript", "category": "Development", "level": "Intermediate" },
+    { "name": "Vector Databases", "category": "AI Tools", "level": "Intermediate" }
+  ]
+}

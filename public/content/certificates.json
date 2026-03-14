@@ -1,0 +1,10 @@
+{
+  "certificates": [
+    {
+      "title": "Sample Certification",
+      "issuer": "Issuer Name",
+      "year": 2024,
+      "image": ""
+    }
+  ]
+}

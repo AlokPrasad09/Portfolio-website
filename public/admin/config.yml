@@ -1,0 +1,73 @@
+# Decap CMS – Portfolio Admin
+# Access at: yourdomain.com/admin
+# For GitHub backend: set repo and use Netlify/Vercel OAuth or GitHub App
+
+backend:
+  name: github
+  repo: AlokPrasad09/alok-prasad-portfolio
+  branch: main
+
+# For local testing without GitHub (no save):
+# backend:
+#   name: test-backend
+
+publish_mode: simple
+media_folder: "public/uploads"
+public_folder: "/uploads"
+locale: "en"
+
+collections:
+  - name: "projects"
+    label: "Projects"
+    file: "public/content/projects.json"
+    format: "json"
+    identifier_field: "title"
+    summary: "{{title}}"
+    fields:
+      - name: "projects"
+        label: "Projects"
+        widget: "list"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Tech Stack", name: "tech_stack", widget: "list" }
+          - { label: "GitHub Link", name: "github_link", widget: "string", required: false }
+          - { label: "Demo Link", name: "demo_link", widget: "string", required: false }
+          - { label: "Image", name: "image", widget: "string", required: false, hint: "URL or path" }
+
+  - name: "blog"
+    label: "Blog"
+    folder: "public/content/blog"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "certificates"
+    label: "Certificates"
+    file: "public/content/certificates.json"
+    format: "json"
+    fields:
+      - name: "certificates"
+        label: "Certificates"
+        widget: "list"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Issuer", name: "issuer", widget: "string" }
+          - { label: "Year", name: "year", widget: "number" }
+          - { label: "Image", name: "image", widget: "string", required: false }
+
+  - name: "skills"
+    label: "Skills"
+    file: "public/content/skills.json"
+    format: "json"
+    fields:
+      - name: "skills"
+        label: "Skills"
+        widget: "list"
+        fields:
+          - { label: "Name", name: "name", widget: "string" }
+          - { label: "Category", name: "category", widget: "string" }
+          - { label: "Level", name: "level", widget: "string" }
